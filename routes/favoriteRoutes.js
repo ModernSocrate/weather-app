@@ -4,9 +4,9 @@ import cookieParser from 'cookie-parser';
 const router = express.Router();
 router.use(cookieParser());
 
-const FAVORITES_COOKIE_NAME = 'weather_favorites';
-const MAX_FAVORITES = 10;
-const COOKIE_OPTIONS = {
+const favorites_cookie_name = 'weather_favorites';
+const max_favorites = 10;
+const cookie_options = {
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -15,7 +15,7 @@ const COOKIE_OPTIONS = {
 
 const getFavoritesFromCookie = (req) => {
   try {
-    const cookieData = req.cookies[FAVORITES_COOKIE_NAME];
+    const cookieData = req.cookies[favorites_cookie_name];
     return cookieData ? JSON.parse(cookieData) : [];
   } catch {
     return [];
@@ -23,7 +23,7 @@ const getFavoritesFromCookie = (req) => {
 };
 
 const setFavoritesCookie = (res, favorites) => {
-  res.cookie(FAVORITES_COOKIE_NAME, JSON.stringify(favorites), COOKIE_OPTIONS);
+  res.cookie(favorites_cookie_name, JSON.stringify(favorites), cookie_options);
 };
 
 router.get('/favorites', (req, res) => {
@@ -54,9 +54,9 @@ router.post('/favorites', (req, res) => {
     });
   }
 
-  if (favorites.length >= MAX_FAVORITES) {
+  if (favorites.length >= max_favorites) {
     return res.status(403).json({ 
-      error: `Maximum ${MAX_FAVORITES} favorites allowed`,
+      error: `Maximum ${max_favorites} favorites allowed`,
       favorites
     });
   }
@@ -101,7 +101,7 @@ router.delete('/favorites', (req, res) => {
 });
 
 router.delete('/favorites/all', (req, res) => {
-  res.clearCookie(FAVORITES_COOKIE_NAME);
+  res.clearCookie(favorites_cookie_name);
   res.json({ 
     message: 'All favorites cleared',
     favorites: []
