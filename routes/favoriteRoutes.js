@@ -1,11 +1,9 @@
-// favoritesRoutes.js
 import express from 'express';
 import cookieParser from 'cookie-parser';
 
 const router = express.Router();
 router.use(cookieParser());
 
-// Constants
 const FAVORITES_COOKIE_NAME = 'weather_favorites';
 const MAX_FAVORITES = 10;
 const COOKIE_OPTIONS = {
@@ -15,7 +13,6 @@ const COOKIE_OPTIONS = {
   sameSite: 'strict'
 };
 
-// Helper functions
 const getFavoritesFromCookie = (req) => {
   try {
     const cookieData = req.cookies[FAVORITES_COOKIE_NAME];
@@ -29,7 +26,6 @@ const setFavoritesCookie = (res, favorites) => {
   res.cookie(FAVORITES_COOKIE_NAME, JSON.stringify(favorites), COOKIE_OPTIONS);
 };
 
-// Favorites Endpoints
 router.get('/favorites', (req, res) => {
   const favorites = getFavoritesFromCookie(req);
   res.json(favorites);
