@@ -102,9 +102,19 @@ function removeChildren(parent) {
 function renderForecast(forecast) {
   removeChildren(forecastRow);
 
+  // Get today's date at midnight for comparison
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   forecast.forEach((dayData, index) => {
-    const day = getWeekDay(new Date(dayData.forecastTimeUtc));
+    const forecastDate = new Date(dayData.forecastTimeUtc);
+    const day = getWeekDay(forecastDate);
     const iconClass = icons[dayData.conditionCode] || 'wi-na';
+
+    // Skip if this is today's forecast
+    if (forecastDate <= today) {
+      return;
+    }
 
     const markup = `
       <div class="forecast-day" data-index="${index}">
@@ -120,21 +130,21 @@ function renderForecast(forecast) {
 
     const dayElement = document.querySelector(`.forecast-day[data-index="${index}"]`);
     dayElement.addEventListener('click', async () => {
-  if (activeHourlyIndex === index) {
-    removeHourlyCards();
-    removeActiveClass(index);
-    activeHourlyIndex = null;
-    return;
-  }
+      if (activeHourlyIndex === index) {
+        removeHourlyCards();
+        removeActiveClass(index);
+        activeHourlyIndex = null;
+        return;
+      }
 
-  removeHourlyCards();
-  removeActiveClass(activeHourlyIndex);
-  activeHourlyIndex = index;
-  dayElement.classList.add("active-day");
+      removeHourlyCards();
+      removeActiveClass(activeHourlyIndex);
+      activeHourlyIndex = index;
+      dayElement.classList.add("active-day");
 
-  const dayName = getWeekDay(new Date(dayData.forecastTimeUtc)); // Add this line
-  await renderHourlyCards(index, dayName);
-  });
+      const dayName = getWeekDay(new Date(dayData.forecastTimeUtc));
+      await renderHourlyCards(index, dayName);
+    });
   });
 }
 
